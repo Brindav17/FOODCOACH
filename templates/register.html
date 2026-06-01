@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-decor" aria-hidden="true"></div>
+
+  <div class="auth-container">
+    <div class="auth-logo">FC</div>
+    <h2>Create account</h2>
+    <div class="subtitle">Join Food Coach — track meals & stay healthy</div>
+
+    <form method="POST" class="auth-form" action="{{ url_for('register') }}">
+      <input type="text" name="username" placeholder="Full name" required>
+      <input type="email" name="email" placeholder="Email address" required>
+      <input type="password" name="password" placeholder="Create a password" required>
+
+      <div class="controls" style="justify-content:center">
+        <label><input type="checkbox" name="terms" required> I agree to the <a href="#">terms</a></label>
+      </div>
+
+      <button class="btn-primary" type="submit">Create account</button>
+    </form>
+
+    <div class="auth-footer">
+      Already registered? <a href="{{ url_for('login') }}">Login</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

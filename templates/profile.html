@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Food Coach</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🍽️ Food Coach</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('food_history') }}">Food Log</a></li>
+            <li><a href="{{ url_for('history') }}">History</a></li>
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        <form method="POST" class="profile-card">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar">👤</div>
+                <h1 class="profile-name">{{ user[1] if user else 'User' }}</h1>
+                <p class="profile-email">{{ user[2] if user else 'No email' }}</p>
+            </div>
+
+            <!-- Profile Body -->
+            <div class="profile-body">
+                <h3 class="section-title">📝 Personal Information</h3>
+                
+                <div class="profile-grid">
+                    <!-- Date of Birth -->
+                    <div class="field">
+                        <label for="dob">🎂 Date of Birth</label>
+                        <input type="date" id="dob" name="dob" value="{{ user[4] if user and user[4] else '' }}">
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="field">
+                        <label for="phone">📱 Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="+91 XXXXX XXXXX" value="{{ user[10] if user and user[10] else '' }}">
+                    </div>
+
+                    <!-- Weight -->
+                    <div class="field">
+                        <label for="weight">⚖️ Weight (kg)</label>
+                        <input type="number" step="0.1" id="weight" name="weight" placeholder="e.g., 70.5" value="{{ user[5] if user and user[5] else '' }}">
+                    </div>
+
+                    <!-- Height -->
+                    <div class="field">
+                        <label for="height">📏 Height (cm)</label>
+                        <input type="number" id="height" name="height" placeholder="e.g., 175" value="{{ user[6] if user and user[6] else '' }}">
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="field">
+                        <label for="gender">⚧️ Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select Gender</option>
+                            <option value="Male" {% if user and user[8] == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if user and user[8] == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if user and user[8] == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Fitness Goal -->
+                    <div class="field">
+                        <label for="goal">🎯 Fitness Goal</label>
+                        <select id="goal" name="goal">
+                            <option value="">Select Goal</option>
+                            <option value="Lose Weight" {% if user and user[7] == 'Lose Weight' %}selected{% endif %}>Lose Weight</option>
+                            <option value="Gain Weight" {% if user and user[7] == 'Gain Weight' %}selected{% endif %}>Gain Weight</option>
+                            <option value="Maintain Weight" {% if user and user[7] == 'Maintain Weight' %}selected{% endif %}>Maintain Weight</option>
+                            <option value="Build Muscle" {% if user and user[7] == 'Build Muscle' %}selected{% endif %}>Build Muscle</option>
+                        </select>
+                    </div>
+
+                    <!-- Health Conditions -->
+                    <div class="field full-width">
+                        <label for="health_conditions">🏥 Health Conditions (optional)</label>
+                        <input type="text" id="health_conditions" name="health_conditions" 
+                               placeholder="e.g., Diabetes, Hypertension, Thyroid, Allergies..." 
+                               value="{{ user[9] if user and user[9] else '' }}">
+                        <small class="profile-note">💡 This helps us provide personalized recommendations (Premium feature)</small>
+                    </div>
+
+                    <!-- BMI Display -->
+                    {% if bmi %}
+                    <div class="bmi-box">
+                        <div>
+                            <div style="font-size: 0.9rem; color: var(--muted-text); margin-bottom: 5px;">Your BMI</div>
+                            <div class="bmi-value">{{ bmi }}</div>
+                        </div>
+                        <div>
+                            {% if bmi < 18.5 %}
+                                <span class="bmi-status under">⚠️ Underweight</span>
+                                <p style="margin: 10px 0 0; color: var(--muted-text); font-size: 0.9rem;">
+                                    Consider increasing your calorie intake with nutritious foods.
+                                </p>
+                            {% elif bmi >= 18.5 and bmi < 25 %}
+                                <span class="bmi-status">✅ Normal weight</span>
+                                <p style="margin: 10px 0 0; color: var(--muted-text); font-size: 0.9rem;">
+                                    Great! Maintain your current lifestyle.
+                                </p>
+                            {% elif bmi >= 25 and bmi < 30 %}
+                                <span class="bmi-status over">⚠️ Overweight</span>
+                                <p style="margin: 10px 0 0; color: var(--muted-text); font-size: 0.9rem;">
+                                    Consider a balanced diet and regular exercise.
+                                </p>
+                            {% else %}
+                                <span class="bmi-status over">⚠️ Obese</span>
+                                <p style="margin: 10px 0 0; color: var(--muted-text); font-size: 0.9rem;">
+                                    Consult a healthcare professional for personalized advice.
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Save Button -->
+                    <div class="profile-actions">
+                        <button type="submit" class="btn-save">💾 Save Profile</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Quick Links -->
+        <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('weight_tracker') }}" style="padding: 12px 24px; background: linear-gradient(135deg, #ffb74d, #f57c00); color: white; border-radius: 10px; font-weight: 700; text-decoration: none; box-shadow: 0 8px 20px rgba(255, 183, 77, 0.3);">
+                ⚖️ Weight Tracker
+            </a>
+            <a href="{{ url_for('settings') }}" style="padding: 12px 24px; background: linear-gradient(135deg, #81c784, #388e3c); color: white; border-radius: 10px; font-weight: 700; text-decoration: none; box-shadow: 0 8px 20px rgba(129, 199, 132, 0.3);">
+                ⚙️ Settings
+            </a>
+            <a href="{{ url_for('premium') }}" style="padding: 12px 24px; background: linear-gradient(135deg, #f093fb, #f5576c); color: white; border-radius: 10px; font-weight: 700; text-decoration: none; box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);">
+                ⭐ Go Premium
+            </a>
+        </div>
+    </main>
+</body>
+</html>

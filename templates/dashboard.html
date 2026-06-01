@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Hi, {{ username }} 👋</h2>
+  <p>Welcome back — track your day and explore foods.</p>
+
+
+  <!-- Top Category Chips -->
+  <div class="category-nav">
+    {% for c in categories %}
+      <a class="chip" href="{{ url_for('category', slug=c.slug) }}">{{ c.name }}</a>
+    {% endfor %}
+  </div>
+
+
+  <!-- Summary Trackers -->
+  <div class="trackers-grid">
+    <!-- Food Calorie Tracker - CLICKABLE -->
+    <a href="{{ url_for('analytics') }}" class="tracker-card food" style="text-decoration: none; color: white;">
+      <h3>🍽️ Food Intake</h3>
+      <div class="value">{{ food_cals_today }} kcal</div>
+      <small>Calories consumed today</small>
+      <div class="btn-small outline" style="margin-top: 10px;">📊 View Charts</div>
+    </a>
+
+
+    <!-- Water Tracker -->
+    <div class="tracker-card water">
+      <h3>💧 Water Intake</h3>
+      <div class="value">{{ water_today }} ml</div>
+      <small>Today's total</small>
+      <form method="POST" action="{{ url_for('water') }}" class="inline-form">
+        <input type="number" name="amount_ml" placeholder="ml (e.g., 250)" required>
+        <button class="btn-small">Add</button>
+      </form>
+      <a href="{{ url_for('water') }}" class="btn-small outline">View Details</a>
+    </div>
+
+
+    <!-- Sleep Tracker -->
+    <div class="tracker-card sleep">
+      <h3>😴 Sleep</h3>
+      {% if last_sleep %}
+        <div class="value">{{ last_sleep[0] }} hrs</div>
+        <small>Last logged: {{ last_sleep[1] }}</small>
+      {% else %}
+        <div class="value">—</div>
+        <small>No sleep logged</small>
+      {% endif %}
+      <form method="POST" action="{{ url_for('sleep') }}" class="inline-form">
+        <input type="number" step="0.1" name="sleep_hours" placeholder="hours (e.g., 7.5)" required>
+        <button class="btn-small">Log</button>
+      </form>
+      <a href="{{ url_for('sleep') }}" class="btn-small outline">View Details</a>
+    </div>
+
+
+    <!-- Workout Tracker -->
+    <div class="tracker-card workout">
+      <h3>🏋️ Workouts</h3>
+      <div class="value">{{ workout_cals_today }} kcal</div>
+      <small>Calories burnt today</small>
+      <form method="POST" action="{{ url_for('workout') }}" class="inline-form">
+        <select name="activity" required style="flex: 1; padding: 6px;">
+          <option value="">Select activity</option>
+          <option value="Walking">Walking</option>
+          <option value="Running">Running</option>
+          <option value="Cycling">Cycling</option>
+          <option value="Yoga">Yoga</option>
+          <option value="Strength Training">Strength Training</option>
+          <option value="HIIT">HIIT</option>
+          <option value="Sports">Sports</option>
+        </select>
+        <input type="number" name="duration_min" placeholder="min" required style="flex: 0.6;">
+        <select name="intensity" required style="flex: 0.6;">
+          <option value="">Intensity</option>
+          <option value="Low">Low</option>
+          <option value="Moderate">Moderate</option>
+          <option value="High">High</option>
+        </select>
+        <button class="btn-small">Add</button>
+      </form>
+      <a href="{{ url_for('workout') }}" class="btn-small outline">View Details</a>
+    </div>
+
+
+    <!-- BMI Tracker -->
+    <div class="tracker-card bmi">
+      <h3>⚖️ BMI</h3>
+      <div class="value">{% if bmi %}{{ bmi }}{% else %}—{% endif %}</div>
+      <small>
+        {% if user and user[5] and user[6] %}
+          Weight: {{ user[5] }} kg • Height: {{ user[6] }} cm
+        {% else %}
+          Set profile for BMI
+        {% endif %}
+      </small>
+      <a href="{{ url_for('profile') }}" class="btn-small outline">Edit Profile</a>
+    </div>
+
+
+    <!-- Premium Status Card - FIXED -->
+    <div class="tracker-card" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
+      <h3>👑 Premium</h3>
+      {% if user and user[10] %}
+        <div class="value">Active ✓</div>
+        <small>Valid until {{ user[11] }}</small>
+        <a href="{{ url_for('premium') }}" class="btn-small" style="background: rgba(255, 255, 255, 0.3); margin-top: 10px;">
+          Manage Plan
+        </a>
+      {% else %}
+        <div class="value">Free Plan</div>
+        {% set scans_used = user[12]|int if user and user[12] else 0 %}
+        <small>{{ 3 - scans_used }} scans left</small>
+        <a href="{{ url_for('premium') }}" class="btn-small" style="background: white; color: #FFA500; margin-top: 10px; font-weight: 800;">
+          🚀 Upgrade Now
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <!-- Quick Analytics Preview -->
+  <div class="card" style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.08), rgba(108, 99, 255, 0.03)); border-left: 5px solid var(--accent); margin-top: 25px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h3 style="margin: 0 0 5px;">📊 Today's Calorie Balance</h3>
+        <p style="margin: 0; color: var(--muted-text); font-size: 0.95rem;">Track your daily intake vs burn</p>
+      </div>
+      <a href="{{ url_for('analytics') }}" class="btn-primary" style="text-decoration: none; padding: 12px 24px; display: inline-block;">
+        View Full Analytics →
+      </a>
+    </div>
+  </div>
+
+
+  <!-- Net Calorie Summary -->
+  <div class="net-calorie-banner">
+    <div class="net-cal-item">
+      <div class="net-cal-label">🔥 Calories In</div>
+      <div class="net-cal-value">{{ food_cals_today }}</div>
+    </div>
+    <div class="net-cal-item">
+      <div class="net-cal-label">⚡ Calories Out</div>
+      <div class="net-cal-value">{{ workout_cals_today }}</div>
+    </div>
+    <div class="net-cal-item">
+      <div class="net-cal-label">📊 Net Calories</div>
+      <div class="net-cal-value {% if food_cals_today - workout_cals_today > 0 %}positive{% else %}negative{% endif %}">
+        {{ food_cals_today - workout_cals_today }}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Weekly Graph -->
+  <div class="graph-card">
+    <h3>📊 Weekly Calorie Analysis</h3>
+    <canvas id="weeklyChart"></canvas>
+  </div>
+
+
+  <!-- Motivational Message -->
+  {% set net_cal = food_cals_today - workout_cals_today %}
+  {% if net_cal > 500 %}
+  <div class="motivational-card">
+    <div class="icon">💪</div>
+    <div class="text">
+      <h4>Keep Pushing Forward!</h4>
+      <p>You've consumed more calories today ({{ net_cal }} kcal surplus). A quick 30-minute workout can help balance it out. You've got this! 🔥</p>
+    </div>
+  </div>
+  {% elif net_cal < -200 %}
+  <div class="motivational-card">
+    <div class="icon">⚡</div>
+    <div class="text">
+      <h4>Great Job!</h4>
+      <p>You're burning more than you're eating ({{ net_cal|abs }} kcal deficit)! Make sure to fuel your body properly for sustained energy. 🌟</p>
+    </div>
+  </div>
+  {% else %}
+  <div class="motivational-card">
+    <div class="icon">🎯</div>
+    <div class="text">
+      <h4>Perfect Balance!</h4>
+      <p>You're maintaining a healthy calorie balance today (Net: {{ net_cal }} kcal). Keep up the excellent work! 🌈</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+
+<!-- Category Image Grid -->
+<div class="card">
+  <h3>Explore Food Categories</h3>
+  <p class="text-muted">Upload food images to automatically track calories</p>
+  <div class="category-grid">
+    {% for c in categories %}
+    <div class="category-card">
+      <a href="{{ url_for('category', slug=c.slug) }}">
+        <img src="{{ url_for('static', filename='images/' + c.image) }}" alt="{{ c.name }}">
+        <div class="meta">
+          <h3>{{ c.name }}</h3>
+          <p>Tap to see items & calories</p>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+fetch('/graph_data')
+  .then(res => res.json())
+  .then(data => {
+    const ctx = document.getElementById('weeklyChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.days.map(d => {
+          const date = new Date(d);
+          return date.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'});
+        }),
+        datasets: [
+          {
+            label: 'Calories In',
+            data: data.calories_in,
+            borderColor: '#f5576c',
+            backgroundColor: 'rgba(245, 87, 108, 0.1)',
+            tension: 0.4,
+            fill: true,
+            borderWidth: 3
+          },
+          {
+            label: 'Calories Out',
+            data: data.calories_out,
+            borderColor: '#388e3c',
+            backgroundColor: 'rgba(56, 142, 60, 0.1)',
+            tension: 0.4,
+            fill: true,
+            borderWidth: 3
+          },
+          {
+            label: 'Net Calories',
+            data: data.net,
+            borderColor: '#6C63FF',
+            backgroundColor: 'rgba(108, 99, 255, 0.1)',
+            tension: 0.4,
+            fill: true,
+            borderWidth: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { 
+            display: true, 
+            position: 'top',
+            labels: {
+              font: { size: 14, weight: 'bold' },
+              padding: 15
+            }
+          },
+          tooltip: { 
+            mode: 'index', 
+            intersect: false,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleFont: { size: 14, weight: 'bold' },
+            bodyFont: { size: 13 },
+            padding: 12
+          }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true, 
+            title: { 
+              display: true, 
+              text: 'Calories (kcal)',
+              font: { size: 14, weight: 'bold' }
+            },
+            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+          },
+          x: {
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  })
+  .catch(err => console.error('Error loading graph:', err));
+</script>
+{% endblock %}

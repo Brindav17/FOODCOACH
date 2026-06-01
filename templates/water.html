@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container main-content">
+
+  <!-- 1. Today's Hydration Summary -->
+  <section class="summary-section">
+    <h2>💧 Today's Hydration</h2>
+    <div class="card summary-card">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="label">Water Drunk</div>
+          <div class="value">{{ total_water_ml }} ml</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">Daily Target</div>
+          <div class="value">{{ water_target_ml }} ml</div>
+        </div>
+        <div class="summary-item">
+          <div class="label">Remaining</div>
+          <div class="value">{{ remaining_water_ml }} ml</div>
+        </div>
+      </div>
+
+      <div class="status-box">
+        <strong>Status:</strong>
+        {% if remaining_water_ml > 0 %}
+          <span class="status-badge warning">🚰 Keep Sipping</span>
+        {% else %}
+          <span class="status-badge success">✅ Target Reached</span>
+        {% endif %}
+      </div>
+
+      {% if remaining_water_ml > 0 %}
+        <div class="suggestion-box">
+          <strong>Tip:</strong> Try drinking {{ suggested_glass_ml }} ml every few hours to meet your goal.
+        </div>
+      {% else %}
+        <div class="suggestion-box">
+          <strong>Great job!</strong> You have completed your water goal for today.
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- 2. Add Water Entry -->
+  <section class="add-workout-section">
+    <h3>➕ Log Water Intake</h3>
+    <div class="card">
+      <form method="POST">
+        <div class="form-group">
+          <label for="amount_ml">Amount (ml)</label>
+          <input type="number" id="amount_ml" name="amount_ml" min="50" required placeholder="e.g., 250">
+        </div>
+
+        <div class="form-group">
+          <label for="time">Time</label>
+          <input type="time" id="time" name="time" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Log Water</button>
+
+        <p class="hint-text">
+          💡 Common glass sizes: 200–250 ml. Bottle: 500–1000 ml. Log whatever you actually drink.
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <!-- 3. Today's Water Log -->
+  <section class="timeline-section">
+    <h3>📅 Today's Water Log</h3>
+    <div class="card">
+      {% if today_water_logs %}
+        <div class="timeline-list">
+          {% for w in today_water_logs %}
+          <div class="timeline-item">
+            <div class="timeline-time">🕐 {{ w[3][:5] if w[3] else 'N/A' }}</div>
+            <div class="timeline-content">
+              <strong>{{ w[1] }} ml</strong>
+              <span class="cal-badge">{{ w[2] }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No water logged yet today. Start with a glass now! 💧</p>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+
+<style>
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  background: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.summary-item .label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.summary-item .value {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.status-box,
+.suggestion-box {
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 8px;
+  background: #F5F3FF;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.status-badge.success {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.status-badge.warning {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 15px;
+  padding: 12px;
+  background: #FBF9FF;
+  border-radius: 8px;
+  border-left: 4px solid #A855F7;
+}
+
+.timeline-time {
+  min-width: 80px;
+  font-weight: bold;
+  color: #A855F7;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.cal-badge {
+  background: #EDE9FE;
+  color: #7C3AED;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.hint-text {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 10px;
+  padding: 10px;
+  background: #F5F3FF;
+  border-radius: 6px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9CA3AF;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #DDD6FE;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #A855F7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #C4B5FD, #7C3AED);
+  color: white;
+  width: 100%;
+  box-shadow: 0 10px 25px rgba(129, 140, 248, 0.45);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(129, 140, 248, 0.6);
+}
+</style>
+{% endblock %}

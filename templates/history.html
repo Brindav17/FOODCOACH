@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie History - Food Coach</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🍽️ Food Coach</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('food_history') }}">Food Log</a></li>
+            <li><a href="{{ url_for('history') }}">History</a></li>
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        <div class="card">
+            <h2 style="margin-top: 0;">📊 Calorie History</h2>
+            
+            <!-- View Selector -->
+            <div class="category-nav" style="margin-bottom: 30px;">
+                <a href="{{ url_for('history', view='daily') }}" class="chip {% if view == 'daily' %}active{% endif %}">
+                    Daily (7 days)
+                </a>
+                <a href="{{ url_for('history', view='weekly') }}" class="chip {% if view == 'weekly' %}active{% endif %}">
+                    Weekly (4 weeks)
+                </a>
+                <a href="{{ url_for('history', view='monthly') }}" class="chip {% if view == 'monthly' %}active{% endif %}">
+                    Monthly (6 months)
+                </a>
+            </div>
+
+            <!-- Chart -->
+            <div style="max-width: 900px; margin: 0 auto;">
+                <canvas id="calorieChart"></canvas>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="summary-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 40px;">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                    <div style="font-size: 0.9rem; opacity: 0.95;">Average</div>
+                    <div style="font-size: 2rem; font-weight: 800; margin: 10px 0;">
+                        {{ (data | sum(attribute='calories') / data | length) | int }} kcal
+                    </div>
+                    <div style="font-size: 0.85rem; opacity: 0.9;">per period</div>
+                </div>
+                
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                    <div style="font-size: 0.9rem; opacity: 0.95;">Total</div>
+                    <div style="font-size: 2rem; font-weight: 800; margin: 10px 0;">
+                        {{ data | sum(attribute='calories') }} kcal
+                    </div>
+                    <div style="font-size: 0.85rem; opacity: 0.9;">consumed</div>
+                </div>
+                
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                    <div style="font-size: 0.9rem; opacity: 0.95;">Highest</div>
+                    <div style="font-size: 2rem; font-weight: 800; margin: 10px 0;">
+                        {{ data | max(attribute='calories') }} kcal
+                    </div>
+                    <div style="font-size: 0.85rem; opacity: 0.9;">single day</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const ctx = document.getElementById('calorieChart').getContext('2d');
+        const data = {{ data | tojson }};
+        
+        const labels = data.map(d => d.date);
+        const calories = data.map(d => d.calories);
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Calories Consumed (kcal)',
+                    data: calories,
+                    backgroundColor: 'rgba(108, 99, 255, 0.7)',
+                    borderColor: 'rgba(108, 99, 255, 1)',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            font: { size: 14, weight: 'bold' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' kcal';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <style>
+        .chip.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-600) 100%);
+            color: white;
+            border-color: transparent;
+        }
+    </style>
+</body>
+</html>

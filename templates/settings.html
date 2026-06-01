@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container main-content">
+    <section class="summary-section">
+        <h2>⚙️ Settings</h2>
+        
+        <div class="card">
+            <h3>🔔 Reminder Settings</h3>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label for="water_reminder_time">💧 Water Reminder Time:</label>
+                    <input type="time" 
+                           name="water_reminder_time" 
+                           id="water_reminder_time" 
+                           value="{{ water_time or '09:00' }}" 
+                           class="form-control">
+                    <small>Get reminded to drink water at this time daily</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="sleep_reminder_time">😴 Sleep Reminder Time:</label>
+                    <input type="time" 
+                           name="sleep_reminder_time" 
+                           id="sleep_reminder_time" 
+                           value="{{ sleep_time or '22:00' }}" 
+                           class="form-control">
+                    <small>Get reminded to go to bed at this time</small>
+                </div>
+
+                <button type="submit" class="btn-primary">💾 Save Settings</button>
+            </form>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3>📊 Account Information</h3>
+            <p><strong>Username:</strong> {{ session.get('username') }}</p>
+            <p><strong>User ID:</strong> {{ session.get('user_id') }}</p>
+            <a href="{{ url_for('profile') }}" class="btn-secondary">📝 Edit Profile</a>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h3>🔐 Account Actions</h3>
+            <a href="{{ url_for('logout') }}" class="btn-danger">🚪 Logout</a>
+        </div>
+    </section>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+
+    small {
+        display: block;
+        margin-top: 5px;
+        color: #666;
+        font-size: 13px;
+    }
+
+    .btn-primary {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .btn-primary:hover {
+        background-color: #45a049;
+    }
+
+    .btn-secondary {
+        display: inline-block;
+        background-color: #2196F3;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-right: 10px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #0b7dda;
+    }
+
+    .btn-danger {
+        display: inline-block;
+        background-color: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .btn-danger:hover {
+        background-color: #da190b;
+    }
+
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .card p {
+        margin: 10px 0;
+        color: #555;
+    }
+</style>
+{% endblock %}

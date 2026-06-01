@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container main-content">
+    <section class="summary-section">
+        <h2>🤖 AI Fitness Coach</h2>
+        <div class="card">
+            <!-- Quick Questions -->
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px; color: #666;">Quick questions:</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <button class="quick-btn" onclick="sendQuickQuestion('Give me a diet plan')">🥗 Diet Plan</button>
+                    <button class="quick-btn" onclick="sendQuickQuestion('Create a workout routine')">💪 Workout</button>
+                    <button class="quick-btn" onclick="sendQuickQuestion('What should I eat for breakfast?')">🍳 Breakfast</button>
+                    <button class="quick-btn" onclick="sendQuickQuestion('What is my BMI?')">📊 My BMI</button>
+                    <button class="quick-btn" onclick="sendQuickQuestion('How much water should I drink?')">💧 Hydration</button>
+                    <button class="quick-btn" onclick="sendQuickQuestion('How many calories should I eat?')">🔥 Calories</button>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div id="chatContainer" style="height: 500px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 10px; padding: 20px; background-color: #f9f9f9; margin-bottom: 20px;">
+                <div class="bot-message">
+                    <strong>🤖 AI Coach:</strong>
+                    <p>Hi {{ user[0] if user else 'there' }}! 👋 I'm your personal AI fitness coach. I can help you with diet plans, workout routines, health advice, and more!</p>
+                    <p>Ask me anything about nutrition, exercise, or your fitness goals!</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="userInput" placeholder="Ask me anything about diet, workout, health..." 
+                       style="flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
+                       onkeypress="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()" style="padding: 12px 25px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    Send
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .bot-message {
+        background-color: #e3f2fd;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        animation: slideIn 0.3s ease;
+    }
+
+    .user-message {
+        background-color: #c8e6c9;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        text-align: right;
+        animation: slideIn 0.3s ease;
+    }
+
+    .bot-message strong, .user-message strong {
+        color: #333;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .bot-message p, .user-message p {
+        margin: 8px 0;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .quick-btn {
+        padding: 8px 15px;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.3s;
+    }
+
+    .quick-btn:hover {
+        background-color: #4CAF50;
+        color: white;
+        border-color: #4CAF50;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .loading {
+        display: inline-block;
+        animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+
+    #chatContainer::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #chatContainer::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    #chatContainer::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+
+    #chatContainer::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+
+<script>
+    function sendMessage() {
+        const input = document.getElementById('userInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Display user message
+        addMessage(message, 'user');
+        input.value = '';
+        
+        // Show loading
+        const loadingId = addMessage('Thinking<span class="loading">...</span>', 'bot', true);
+        
+        // Send to server
+        fetch('/chatbot/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Remove loading message
+            document.getElementById(loadingId).remove();
+            
+            if (data.success) {
+                addMessage(data.reply, 'bot');
+            } else {
+                addMessage('Sorry, something went wrong. Please try again.', 'bot');
+            }
+        })
+        .catch(error => {
+            document.getElementById(loadingId).remove();
+            addMessage('Sorry, something went wrong. Please check your connection and try again.', 'bot');
+        });
+    }
+
+    function sendQuickQuestion(question) {
+        document.getElementById('userInput').value = question;
+        sendMessage();
+    }
+
+    function addMessage(text, sender, isLoading = false) {
+        const chatContainer = document.getElementById('chatContainer');
+        const messageDiv = document.createElement('div');
+        const messageId = 'msg-' + Date.now();
+        
+        messageDiv.id = messageId;
+        messageDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+        
+        if (sender === 'user') {
+            messageDiv.innerHTML = `<strong>You:</strong><p>${text}</p>`;
+        } else {
+            messageDiv.innerHTML = `<strong>🤖 AI Coach:</strong><p>${text}</p>`;
+        }
+        
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+        return messageId;
+    }
+</script>
+{% endblock %}

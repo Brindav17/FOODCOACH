@@ -1,0 +1,665 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container main-content survey-page">
+  <div class="survey-container">
+    
+    <!-- Progress Indicator -->
+    <div class="survey-progress">
+      <div class="progress-bar" style="width: 12.5%;"></div>
+    </div>
+    <div class="progress-text">Question <span id="current-q">1</span> of 8</div>
+
+    <!-- Survey Form with Slides -->
+    <form method="POST" class="survey-slides" id="surveyForm">
+      
+      <!-- Slide 1: Q1 - Body Build -->
+      <div class="survey-slide active" data-slide="1">
+        <div class="slide-content">
+          <div class="slide-emoji">💪</div>
+          <h2>What's your natural body build?</h2>
+          <p class="slide-subtitle">This helps us understand your body type</p>
+          
+          <div class="slide-options">
+            <label class="option-card" style="border-left: 5px solid #667eea;">
+              <input type="radio" name="q1" value="A" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">🏃</div>
+              <div class="option-text">
+                <div class="option-title">Slim, Narrow Shoulders</div>
+                <div class="option-desc">Ectomorph - naturally lean</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #42a5f5;">
+              <input type="radio" name="q1" value="B" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">🏋️</div>
+              <div class="option-text">
+                <div class="option-title">Athletic, Muscular</div>
+                <div class="option-desc">Mesomorph - naturally athletic</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #66bb6a;">
+              <input type="radio" name="q1" value="C" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">🍽️</div>
+              <div class="option-text">
+                <div class="option-title">Broad, Round Shape</div>
+                <div class="option-desc">Endomorph - higher fat storage</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Q2 - Weight Gain -->
+      <div class="survey-slide" data-slide="2">
+        <div class="slide-content">
+          <div class="slide-emoji">⚖️</div>
+          <h2>How do you gain weight?</h2>
+          <p class="slide-subtitle">Understanding your metabolism</p>
+          
+          <div class="slide-options">
+            <label class="option-card" style="border-left: 5px solid #ab47bc;">
+              <input type="radio" name="q2" value="A" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">📉</div>
+              <div class="option-text">
+                <div class="option-title">Hard to Gain Weight</div>
+                <div class="option-desc">Fast metabolism</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ec407a;">
+              <input type="radio" name="q2" value="B" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">💪</div>
+              <div class="option-text">
+                <div class="option-title">Gain Muscle Easily</div>
+                <div class="option-desc">Balanced metabolism</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ffa726;">
+              <input type="radio" name="q2" value="C" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">📈</div>
+              <div class="option-text">
+                <div class="option-title">Gain Fat Easily</div>
+                <div class="option-desc">Slower metabolism</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Q3 - Fat Storage -->
+      <div class="survey-slide" data-slide="3">
+        <div class="slide-content">
+          <div class="slide-emoji">🎯</div>
+          <h2>Where do you store fat?</h2>
+          <p class="slide-subtitle">Fat distribution matters</p>
+          
+          <div class="slide-options">
+            <label class="option-card" style="border-left: 5px solid #29b6f6;">
+              <input type="radio" name="q3" value="A" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">✨</div>
+              <div class="option-text">
+                <div class="option-title">Minimal</div>
+                <div class="option-desc">Very low fat storage</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #5c6bc0;">
+              <input type="radio" name="q3" value="B" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">⚖️</div>
+              <div class="option-text">
+                <div class="option-title">Moderate</div>
+                <div class="option-desc">Balanced storage</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ef5350;">
+              <input type="radio" name="q3" value="C" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">📍</div>
+              <div class="option-text">
+                <div class="option-title">High (Belly/Hips)</div>
+                <div class="option-desc">Concentrated storage</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Q4 - Fitness Goal -->
+      <div class="survey-slide" data-slide="4">
+        <div class="slide-content">
+          <div class="slide-emoji">🎯</div>
+          <h2>What's your primary fitness goal?</h2>
+          <p class="slide-subtitle">Let's align your workouts</p>
+          
+          <div class="slide-options">
+            <label class="option-card" style="border-left: 5px solid #ef5350;">
+              <input type="radio" name="q4" value="Fat loss" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">⚡</div>
+              <div class="option-text">
+                <div class="option-title">Fat Loss</div>
+                <div class="option-desc">Burn calories and lose weight</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #66bb6a;">
+              <input type="radio" name="q4" value="Muscle gain" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">💪</div>
+              <div class="option-text">
+                <div class="option-title">Muscle Gain</div>
+                <div class="option-desc">Build strength & size</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #29b6f6;">
+              <input type="radio" name="q4" value="Maintain fitness" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">⚖️</div>
+              <div class="option-text">
+                <div class="option-title">Maintain Fitness</div>
+                <div class="option-desc">Keep current level</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ab47bc;">
+              <input type="radio" name="q4" value="Endurance" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">🏃</div>
+              <div class="option-text">
+                <div class="option-title">Improve Endurance</div>
+                <div class="option-desc">Build stamina & cardio</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Q5 - Activity Level -->
+      <div class="survey-slide" data-slide="5">
+        <div class="slide-content">
+          <div class="slide-emoji">🏃</div>
+          <h2>What's your current activity level?</h2>
+          <p class="slide-subtitle">How often do you exercise?</p>
+          
+          <div class="slide-options">
+            <label class="option-card" style="border-left: 5px solid #bdbdbd;">
+              <input type="radio" name="q5" value="Sedentary" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">🛋️</div>
+              <div class="option-text">
+                <div class="option-title">Sedentary</div>
+                <div class="option-desc">Little to no exercise</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ffa726;">
+              <input type="radio" name="q5" value="Light" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">🚶</div>
+              <div class="option-text">
+                <div class="option-title">Light Activity</div>
+                <div class="option-desc">1-3 days/week</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #42a5f5;">
+              <input type="radio" name="q5" value="Moderate" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">🚴</div>
+              <div class="option-text">
+                <div class="option-title">Moderate Activity</div>
+                <div class="option-desc">3-5 days/week</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #66bb6a;">
+              <input type="radio" name="q5" value="Active" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">⚡</div>
+              <div class="option-text">
+                <div class="option-title">Very Active</div>
+                <div class="option-desc">Daily or almost daily</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 6: Q6 - Health Conditions -->
+      <div class="survey-slide" data-slide="6">
+        <div class="slide-content">
+          <div class="slide-emoji">🏥</div>
+          <h2>Any health conditions?</h2>
+          <p class="slide-subtitle">Select all that apply (or none)</p>
+          
+          <div class="slide-options multi-select">
+            <label class="option-card" style="border-left: 5px solid #29b6f6;">
+              <input type="checkbox" name="q6" value="Diabetes" class="slide-input">
+              <div class="option-icon">🩺</div>
+              <div class="option-text">Diabetes</div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ab47bc;">
+              <input type="checkbox" name="q6" value="Thyroid" class="slide-input">
+              <div class="option-icon">🦋</div>
+              <div class="option-text">Thyroid</div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ec407a;">
+              <input type="checkbox" name="q6" value="PCOS" class="slide-input">
+              <div class="option-icon">👩</div>
+              <div class="option-text">PCOS</div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ef5350;">
+              <input type="checkbox" name="q6" value="Hypertension" class="slide-input">
+              <div class="option-icon">💓</div>
+              <div class="option-text">Hypertension</div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ffa726;">
+              <input type="checkbox" name="q6" value="Joint pain" class="slide-input">
+              <div class="option-icon">🦵</div>
+              <div class="option-text">Joint Pain</div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #66bb6a;">
+              <input type="checkbox" name="q6" value="Asthma" class="slide-input">
+              <div class="option-icon">😤</div>
+              <div class="option-text">Asthma</div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #bdbdbd;">
+              <input type="checkbox" name="q6" value="None" class="slide-input" onchange="handleNoneCheckbox(this)">
+              <div class="option-icon">✅</div>
+              <div class="option-text">None</div>
+            </label>
+          </div>
+          
+          <button type="button" class="btn btn-next" onclick="nextSlide()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Slide 7: Q7 - Sleep -->
+      <div class="survey-slide" data-slide="7">
+        <div class="slide-content">
+          <div class="slide-emoji">😴</div>
+          <h2>How much sleep do you get?</h2>
+          <p class="slide-subtitle">Average hours per night</p>
+          
+          <div class="slide-options">
+            <label class="option-card" style="border-left: 5px solid #ef5350;">
+              <input type="radio" name="q7" value="<5" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">😩</div>
+              <div class="option-text">
+                <div class="option-title">&lt;5 Hours</div>
+                <div class="option-desc">Not enough</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ffa726;">
+              <input type="radio" name="q7" value="5-6" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">😴</div>
+              <div class="option-text">
+                <div class="option-title">5-6 Hours</div>
+                <div class="option-desc">Below average</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #42a5f5;">
+              <input type="radio" name="q7" value="7-8" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">😌</div>
+              <div class="option-text">
+                <div class="option-title">7-8 Hours</div>
+                <div class="option-desc">Good</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #66bb6a;">
+              <input type="radio" name="q7" value="8+" class="slide-input" onchange="nextSlide()">
+              <div class="option-icon">😴</div>
+              <div class="option-text">
+                <div class="option-title">8+ Hours</div>
+                <div class="option-desc">Excellent</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 8: Q8 - Water -->
+      <div class="survey-slide" data-slide="8">
+        <div class="slide-content">
+          <div class="slide-emoji">💧</div>
+          <h2>How much water do you drink?</h2>
+          <p class="slide-subtitle">Daily water intake</p>
+          
+          <div class="slide-options">
+            <label class="option-card" style="border-left: 5px solid #ef5350;">
+              <input type="radio" name="q8" value="<1L" class="slide-input" onchange="submitSurvey()">
+              <div class="option-icon">😰</div>
+              <div class="option-text">
+                <div class="option-title">&lt;1L</div>
+                <div class="option-desc">Very low</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #ffa726;">
+              <input type="radio" name="q8" value="1-2L" class="slide-input" onchange="submitSurvey()">
+              <div class="option-icon">💧</div>
+              <div class="option-text">
+                <div class="option-title">1-2L</div>
+                <div class="option-desc">Low</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #42a5f5;">
+              <input type="radio" name="q8" value="2-3L" class="slide-input" onchange="submitSurvey()">
+              <div class="option-icon">💦</div>
+              <div class="option-text">
+                <div class="option-title">2-3L</div>
+                <div class="option-desc">Good</div>
+              </div>
+            </label>
+
+            <label class="option-card" style="border-left: 5px solid #66bb6a;">
+              <input type="radio" name="q8" value="3L+" class="slide-input" onchange="submitSurvey()">
+              <div class="option-icon">🌊</div>
+              <div class="option-text">
+                <div class="option-title">3L+</div>
+                <div class="option-desc">Excellent</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- Navigation Buttons -->
+    <div class="survey-nav" id="surveyNav">
+      <button type="button" class="btn btn-outline" onclick="prevSlide()">← Back</button>
+      <button type="button" class="btn btn-primary" onclick="submitSurvey()" style="display:none;" id="submitBtn">✓ Complete Survey</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let currentSlide = 1;
+const totalSlides = 8;
+
+function nextSlide() {
+  if (currentSlide < totalSlides) {
+    currentSlide++;
+    updateSlide();
+  } else {
+    submitSurvey();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 1) {
+    currentSlide--;
+    updateSlide();
+  }
+}
+
+function updateSlide() {
+  // Hide all slides
+  document.querySelectorAll('.survey-slide').forEach(slide => {
+    slide.classList.remove('active');
+  });
+  
+  // Show current slide
+  document.querySelector(`[data-slide="${currentSlide}"]`).classList.add('active');
+  
+  // Update progress
+  document.getElementById('current-q').textContent = currentSlide;
+  const progressPercent = (currentSlide / totalSlides) * 100;
+  document.querySelector('.progress-bar').style.width = progressPercent + '%';
+  
+  // Show/hide buttons
+  const backBtn = document.querySelector('.btn-outline');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  if (currentSlide === 1) {
+    backBtn.style.display = 'none';
+  } else {
+    backBtn.style.display = 'inline-block';
+  }
+  
+  if (currentSlide === totalSlides) {
+    submitBtn.style.display = 'inline-block';
+  } else {
+    submitBtn.style.display = 'none';
+  }
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handleNoneCheckbox(checkbox) {
+  if (checkbox.checked) {
+    // Uncheck all others
+    document.querySelectorAll('input[name="q6"]').forEach(cb => {
+      if (cb !== checkbox) cb.checked = false;
+    });
+  }
+}
+
+function submitSurvey() {
+  document.getElementById('surveyForm').submit();
+}
+
+// Initialize
+updateSlide();
+</script>
+
+<style>
+.survey-page {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.survey-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px 30px;
+  overflow: hidden;
+}
+
+.survey-progress {
+  width: 100%;
+  height: 6px;
+  background: #f0f0f0;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+.survey-slides {
+  position: relative;
+  min-height: 400px;
+}
+
+.survey-slide {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(50px);
+  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.survey-slide.active {
+  position: relative;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.slide-content {
+  text-align: center;
+}
+
+.slide-emoji {
+  font-size: 80px;
+  margin-bottom: 20px;
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.slide-content h2 {
+  font-size: 28px;
+  color: #333;
+  margin: 0 0 10px;
+  font-weight: bold;
+}
+
+.slide-subtitle {
+  font-size: 14px;
+  color: #888;
+  margin: 0 0 30px;
+}
+
+.slide-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.slide-options.multi-select {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px 20px;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.option-card:hover {
+  border-color: #667eea;
+  background: #f5f5ff;
+  transform: translateY(-2px);
+}
+
+.option-card input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+.slide-options.multi-select .option-card {
+  flex-direction: column;
+  text-align: center;
+  gap: 10px;
+}
+
+.slide-options.multi-select .option-card input {
+  order: -1;
+}
+
+.option-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.slide-options.multi-select .option-icon {
+  font-size: 28px;
+}
+
+.option-text {
+  flex: 1;
+  text-align: left;
+}
+
+.slide-options.multi-select .option-text {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.option-title {
+  font-weight: bold;
+  color: #333;
+  font-size: 15px;
+}
+
+.option-desc {
+  font-size: 12px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.btn-next {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.survey-nav {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+  justify-content: center;
+}
+
+.btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline {
+  background: white;
+  border: 2px solid #ddd;
+  color: #333;
+}
+
+.btn-outline:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Food Manually - Food Coach</title>
+
+  <style>
+  /* ===== Add Food Manually – page‑only CSS ===== */
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at 0% 0%, #ede9fe, #f9fafb 40%, #f3e8ff 100%);
+    color: #111827;
+  }
+
+  .navbar {
+    background: linear-gradient(90deg, #A855F7, #7C3AED);
+    color: #fff;
+    padding: 14px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(55, 48, 163, 0.35);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-weight: 800;
+    font-size: 18px;
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+  }
+
+  .nav-links a:hover {
+    background: rgba(255,255,255,0.18);
+  }
+
+  .flash-container {
+    max-width: 960px;
+    margin: 14px auto 0;
+    padding: 0 18px;
+  }
+
+  .flash {
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  main {
+    max-width: 960px;
+    margin: 32px auto 0;
+    padding: 0 18px 60px;
+  }
+
+  .card.manual-entry-card {
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 26px 28px 30px;
+    box-shadow: 0 22px 55px rgba(15, 23, 42, 0.16);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+  }
+
+  .manual-entry-card h2 {
+    margin: 0 0 6px;
+    font-size: 1.7rem;
+    font-weight: 800;
+  }
+
+  .text-muted {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 22px;
+  }
+
+  .manual-entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .manual-entry-form label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #111827;
+  }
+
+  .manual-entry-form input[type="text"],
+  .manual-entry-form input[type="number"],
+  .manual-entry-form select {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    background: #ffffff;
+    font-size: 0.96rem;
+    font-family: inherit;
+  }
+
+  .manual-entry-form input::placeholder {
+    color: #9ca3af;
+  }
+
+  .manual-entry-form input:focus,
+  .manual-entry-form select:focus {
+    outline: none;
+    border-color: #A855F7;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .macros-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 20px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .btn-primary {
+    border: none;
+    border-radius: 999px;
+    padding: 11px 22px;
+    background: linear-gradient(120deg, #c4b5fd, #7c3aed);
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 14px 30px rgba(129, 140, 248, 0.55);
+  }
+
+  .btn-secondary {
+    text-decoration: none;
+    border-radius: 999px;
+    padding: 10px 20px;
+    border: 2px solid #A855F7;
+    color: #A855F7;
+    font-weight: 600;
+    background: transparent;
+  }
+
+  @media (max-width: 768px) {
+    main {
+      padding: 0 12px 40px;
+    }
+
+    .card.manual-entry-card {
+      padding: 20px 18px 24px;
+    }
+
+    .macros-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">🍽️ Food Coach</div>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+      <li><a href="{{ url_for('food_history') }}">Food Log</a></li>
+      <li><a href="{{ url_for('logout') }}">Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <main>
+    <div class="card manual-entry-card">
+      <h2>✍️ Add Food Manually</h2>
+      <p class="text-muted">Enter food details to track your nutrition</p>
+
+      <form method="POST" class="manual-entry-form">
+        <div class="field">
+          <label for="food_name">🍽️ Food Name</label>
+          <input type="text" name="food_name" id="food_name"
+                 placeholder="e.g., Grilled Chicken Salad" required>
+        </div>
+
+        <div class="field">
+          <label for="calories">🔥 Calories</label>
+          <input type="number" name="calories" id="calories"
+                 placeholder="e.g., 350" required>
+        </div>
+
+        <div class="field">
+          <label for="category">📂 Category</label>
+          <select name="category" id="category" required>
+            <option value="">Select Category</option>
+            <option value="South Indian">South Indian</option>
+            <option value="North Indian">North Indian</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Italian">Italian</option>
+            <option value="Dessert">Dessert</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="meal_type">🍴 Meal Type</label>
+          <select name="meal_type" id="meal_type">
+            <option value="">Select Meal</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snack">Snack</option>
+          </select>
+        </div>
+
+        <h3 style="margin-top: 30px; margin-bottom: 15px;">Macros (Optional)</h3>
+
+        <div class="macros-grid">
+          <div class="field">
+            <label for="protein">🥩 Protein (g)</label>
+            <input type="number" step="0.1" name="protein" id="protein" placeholder="0">
+          </div>
+
+          <div class="field">
+            <label for="carbs">🍞 Carbs (g)</label>
+            <input type="number" step="0.1" name="carbs" id="carbs" placeholder="0">
+          </div>
+
+          <div class="field">
+            <label for="fat">🥑 Fat (g)</label>
+            <input type="number" step="0.1" name="fat" id="fat" placeholder="0">
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 30px;">
+          <button type="submit" class="btn-primary">💾 Save Food Entry</button>
+          <a href="{{ url_for('food_history') }}" class="btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>

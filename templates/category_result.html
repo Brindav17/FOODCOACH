@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Analysis Result - {{ category_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .result-container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 20px; 
+            padding: 40px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .header-section h2 {
+            margin: 0;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .food-image { 
+            width: 100%; 
+            max-height: 450px; 
+            object-fit: cover; 
+            border-radius: 15px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .main-result { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            margin-bottom: 30px; 
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .main-result h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        
+        .main-result h1 {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .stat-box {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            min-width: 150px;
+            flex: 1;
+        }
+        
+        .calorie-badge { 
+            font-size: 3rem; 
+            font-weight: bold; 
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .category-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .detection-section {
+            margin-top: 40px;
+        }
+        
+        .detection-section h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+        
+        .detection-item { 
+            background: #f8f9fa; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .detection-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .detection-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detection-name strong {
+            font-size: 1.1rem;
+            color: #333;
+            text-transform: capitalize;
+        }
+        
+        .detection-calories {
+            text-align: right;
+        }
+        
+        .detection-calories strong {
+            font-size: 1.3rem;
+            color: #667eea;
+        }
+        
+        .detection-calories small {
+            display: block;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+        
+        .confidence-bar { 
+            height: 10px; 
+            background: #e9ecef; 
+            border-radius: 5px; 
+            overflow: hidden; 
+            margin-bottom: 8px;
+        }
+        
+        .confidence-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); 
+            transition: width 0.8s ease-out;
+            width: 0;
+        }
+        
+        .confidence-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 600;
+        }
+        
+        .success-alert {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.3);
+        }
+        
+        .success-alert strong {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .bottom-actions {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #667eea;
+            color: #667eea;
+            background: white;
+        }
+        
+        .btn-outline-primary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid #6c757d;
+            color: #6c757d;
+            background: white;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .badge {
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge.bg-secondary {
+            background: #6c757d !important;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state h4 {
+            margin-bottom: 15px;
+        }
+        
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-container {
+            animation: slideInUp 0.6s ease-out;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .result-container {
+                padding: 25px;
+            }
+            
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                width: 100%;
+            }
+            
+            .action-buttons a {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .main-result h1 {
+                font-size: 1.8rem;
+            }
+            
+            .calorie-badge {
+                font-size: 2.2rem;
+            }
+            
+            .stats-row {
+                flex-direction: column;
+            }
+            
+            .stat-box {
+                width: 100%;
+            }
+            
+            .bottom-actions {
+                flex-direction: column;
+            }
+            
+            .bottom-actions a {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h2>📊 Analysis Results</h2>
+            <div class="action-buttons">
+                <a href="{{ url_for('category', slug=slug) }}" class="btn btn-outline-primary">
+                    📸 Analyze Another
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                    ← Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Uploaded Food Image -->
+        <img src="{{ url_for('static', filename='uploads/' + image) }}" class="food-image" alt="Uploaded food">
+
+        <!-- Main Detection Result -->
+        <div class="main-result">
+            <h3>🍽️ Main Dish Detected</h3>
+            <h1>{{ main_dish.name }}</h1>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <span class="calorie-badge">{{ main_dish.calories }}</span>
+                    <span class="stat-label">Calories</span>
+                </div>
+                <div class="stat-box">
+                    <span class="calorie-badge">{{ main_dish.confidence }}%</span>
+                    <span class="stat-label">Confidence</span>
+                </div>
+                <div class="stat-box">
+                    <span class="calorie-badge">📏</span>
+                    <span class="stat-label">{{ main_dish.serving }}</span>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <span class="category-badge">{{ main_dish.category }}</span>
+            </div>
+        </div>
+
+        <!-- Other Possible Detections -->
+        {% if items|length > 1 %}
+        <div class="detection-section">
+            <h4>🔍 Other Possible Detections:</h4>
+            
+            {% for item in items[1:] %}
+            <div class="detection-item">
+                <div class="detection-header">
+                    <div class="detection-name">
+                        <strong>{{ item.name }}</strong>
+                        <span class="badge bg-secondary">{{ item.category }}</span>
+                    </div>
+                    <div class="detection-calories">
+                        <strong>{{ item.calories }} cal</strong>
+                        <small>{{ item.serving }}</small>
+                    </div>
+                </div>
+                
+                <div class="confidence-bar">
+                    <div class="confidence-fill" data-width="{{ item.confidence }}"></div>
+                </div>
+                <span class="confidence-text">{{ item.confidence }}% confidence match</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Success Message -->
+        <div class="success-alert">
+            <strong>✅ Successfully Logged!</strong>
+            <p style="margin: 0;">This meal has been automatically added to your daily calorie tracker.</p>
+        </div>
+
+        <!-- Bottom Action Buttons -->
+        <div class="bottom-actions">
+            <a href="{{ url_for('food_history') }}" class="btn btn-primary">
+                📖 View Food History
+            </a>
+            <a href="{{ url_for('category', slug=slug) }}" class="btn btn-outline-primary">
+                Upload Another {{ category_name }} Dish
+            </a>
+        </div>
+    </div>
+
+    <!-- JavaScript for Animations -->
+    <script>
+        // Animate confidence bars on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const bars = document.querySelectorAll('.confidence-fill');
+            
+            setTimeout(() => {
+                bars.forEach(bar => {
+                    const targetWidth = bar.getAttribute('data-width');
+                    bar.style.width = targetWidth + '%';
+                });
+            }, 300);
+        });
+
+        // Add subtle animation to detection items
+        const detectionItems = document.querySelectorAll('.detection-item');
+        detectionItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                item.style.transition = 'all 0.5s ease-out';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 100 * (index + 1));
+        });
+    </script>
+</body>
+</html>

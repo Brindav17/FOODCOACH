@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food History - Food Coach</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🍽️ Food Coach</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('food_history') }}">Food Log</a></li>
+            <li><a href="{{ url_for('manual_food_entry') }}">+ Add Food</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <h2 style="margin: 0;">📖 Food Log History</h2>
+                <a href="{{ url_for('manual_food_entry') }}" class="btn-primary" style="text-decoration: none; padding: 10px 20px; font-size: 0.9rem;">
+                    + Add Food Manually
+                </a>
+            </div>
+
+            {% if logs %}
+            <div style="display: grid; gap: 15px;">
+                {% for log in logs %}
+                <div class="food-log-card" style="padding: 18px; border-radius: 14px; border: 1px solid #e9e9f3; background: white; display: flex; justify-content: space-between; align-items: center; gap: 20px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                    
+                    <!-- Image (if exists) -->
+                    {% if log[5] %}
+                    <img src="{{ url_for('static', filename='uploads/' + log[5]) }}" 
+                         alt="{{ log[1] }}" 
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    {% else %}
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                        🍽️
+                    </div>
+                    {% endif %}
+
+                    <!-- Food Info -->
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0 0 5px 0; color: var(--text); font-size: 1.2rem;">{{ log[1] }}</h3>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap; color: var(--muted-text); font-size: 0.9rem;">
+                            <span>📍 {{ log[3] }}</span>
+                            <span>🔥 {{ log[2] }} kcal</span>
+                            <span>📅 {{ log[4] }}</span>
+                            <span>🕐 {{ log[6] }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="{{ url_for('edit_food', food_id=log[0]) }}" 
+                           style="padding: 8px 16px; background: rgba(108,99,255,0.1); color: var(--accent); border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; transition: all 0.2s ease;">
+                            ✏️ Edit
+                        </a>
+                        
+                        <form method="POST" action="{{ url_for('delete_food', food_id=log[0]) }}" style="margin: 0;" onsubmit="return confirm('Delete this food entry?');">
+                            <button type="submit" 
+                                    style="padding: 8px 16px; background: rgba(214,69,69,0.1); color: #d64545; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s ease;">
+                                🗑️ Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 60px 20px; color: var(--muted-text);">
+                <div style="font-size: 4rem; margin-bottom: 15px;">🍽️</div>
+                <h3 style="margin: 0 0 10px 0; color: var(--text);">No food entries yet</h3>
+                <p>Start tracking by scanning food or adding manually</p>
+                <a href="{{ url_for('dashboard') }}" class="btn-primary" style="margin-top: 20px; display: inline-block; text-decoration: none;">
+                    Go to Dashboard
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <style>
+        .food-log-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+        }
+        .food-log-card a:hover {
+            background: rgba(108,99,255,0.2) !important;
+        }
+        .food-log-card button:hover {
+            background: rgba(214,69,69,0.2) !important;
+        }
+    </style>
+</body>
+</html>

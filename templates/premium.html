@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="premium-container">
+  <div class="premium-header">
+    <h1>👑 Upgrade to Premium</h1>
+    <p>Unlock unlimited food scans, personalized diet charts, and advanced health tracking</p>
+  </div>
+
+  {% if user %}
+  <div style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.08), rgba(108, 99, 255, 0.03)); padding: 25px; border-radius: 16px; margin-bottom: 40px; border-left: 5px solid var(--accent);">
+    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 25px;">
+      <div style="text-align: center;">
+        <div style="font-size: 0.9rem; color: var(--muted-text); margin-bottom: 8px;">Current Status</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: var(--text);">
+          {% if user[0] %}👑 Premium{% else %}🆓 Free Plan{% endif %}
+        </div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 0.9rem; color: var(--muted-text); margin-bottom: 8px;">Free Scans Used</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: {% if user[2] >= 3 %}var(--danger){% else %}var(--accent){% endif %};">
+          {{ user[2] }} / 3
+        </div>
+      </div>
+      {% if user[0] and user[1] %}
+      <div style="text-align: center;">
+        <div style="font-size: 0.9rem; color: var(--muted-text); margin-bottom: 8px;">Valid Until</div>
+        <div style="font-size: 1.8rem; font-weight: 800; color: var(--success);">
+          {{ user[1] }}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="premium-plans">
+    <!-- Monthly Plan -->
+    <div class="plan-card">
+      <div class="plan-name">💳 Monthly</div>
+      <div class="plan-price">
+        ₹49
+        <small>/month</small>
+      </div>
+      <ul class="plan-features">
+        <li>Unlimited food scans</li>
+        <li>Advanced calorie tracking</li>
+        <li>Weight progress graphs</li>
+        <li>Custom notifications</li>
+        <li>Priority support</li>
+      </ul>
+      <button onclick="showPaymentQR('monthly', 49)" class="btn-subscribe">Choose Monthly</button>
+    </div>
+
+    <!-- Yearly Plan -->
+    <div class="plan-card featured">
+      <div class="plan-badge">BEST VALUE</div>
+      <div class="plan-name">🌟 Yearly</div>
+      <div class="plan-price">
+        ₹499
+        <small>/year</small>
+      </div>
+      <div class="plan-savings">💰 Save ₹89 per year</div>
+      <ul class="plan-features">
+        <li>Everything in Monthly</li>
+        <li><strong>Personalized diet charts</strong></li>
+        <li><strong>Meal planning assistant</strong></li>
+        <li>Export health reports</li>
+        <li>Early access to features</li>
+        <li>Dedicated health coach</li>
+      </ul>
+      <button onclick="showPaymentQR('yearly', 499)" class="btn-subscribe">Choose Yearly ⭐</button>
+    </div>
+  </div>
+
+  <!-- Payment QR Modal -->
+  <div id="paymentModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; text-align: center; position: relative; animation: modalPop 0.3s ease;">
+      <button onclick="closePaymentModal()" style="position: absolute; top: 15px; right: 15px; background: #f0f0f0; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.3rem; font-weight: 800;">×</button>
+      
+      <h2 style="margin-bottom: 15px; color: var(--accent);">💳 Complete Payment</h2>
+      <p style="color: var(--muted-text); margin-bottom: 25px;">Scan the QR code to pay via UPI</p>
+      
+      <div style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(108, 99, 255, 0.05)); padding: 25px; border-radius: 16px; margin-bottom: 20px;">
+        <div id="planDetails" style="font-size: 1.5rem; font-weight: 800; margin-bottom: 10px;"></div>
+        <div id="amountDetails" style="font-size: 2.5rem; font-weight: 800; color: var(--accent);"></div>
+      </div>
+      
+      <!-- QR Code Image -->
+      <!-- QR Code Image -->
+       <div style="margin: 20px auto; text-align: center;">
+        <img src="{{ url_for('static', filename='images/QR_code.jpg') }}" 
+        alt="Payment QR Code" 
+        style="width: 280px; height: 280px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: inline-block;">
+</div>
+      <!-- Fallback if QR image not found -->
+      <div style="display: none; width: 280px; height: 280px; margin: 20px auto; background: linear-gradient(135deg, var(--accent), var(--accent-400)); border-radius: 12px; color: white; font-size: 1.2rem; font-weight: 700; align-items: center; justify-content: center; flex-direction: column; gap: 10px;">
+        <div style="font-size: 3rem;">📱</div>
+        <div>QR Code</div>
+        <div style="font-size: 0.9rem; opacity: 0.9;">Place your QR image at</div>
+        <div style="font-size: 0.8rem; font-family: monospace;">static/images/QR_code.jpg</div>
+      </div>
+      
+      <p style="color: var(--muted-text); font-size: 0.9rem; margin: 20px 0;">After payment, click confirm below</p>
+      
+      <form method="POST" action="{{ url_for('process_payment') }}">
+        <input type="hidden" name="plan_type" id="planTypeInput" value="">
+        <button type="submit" class="btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">✅ I've Completed Payment</button>
+      </form>
+      
+      <p style="color: var(--muted-text); font-size: 0.85rem; margin-top: 15px;">
+        <strong>Note:</strong> In production, this will be integrated with Razorpay/Paytm payment gateway
+      </p>
+    </div>
+  </div>
+
+  <!-- Premium Features -->
+  <div class="premium-features-section">
+    <h2>✨ Why Go Premium?</h2>
+    
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">📸</div>
+        <div class="feature-title">Unlimited Scans</div>
+        <p class="feature-desc">Scan unlimited food items without restrictions</p>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Advanced Analytics</div>
+        <p class="feature-desc">Detailed graphs for calories, nutrition & progress</p>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">🥗</div>
+        <div class="feature-title">Diet Charts</div>
+        <p class="feature-desc">Personalized meal plans for your health goals</p>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">🔔</div>
+        <div class="feature-title">Smart Reminders</div>
+        <p class="feature-desc">Custom notifications for meals, water & workouts</p>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">⚖️</div>
+        <div class="feature-title">Weight Tracking</div>
+        <p class="feature-desc">Visual weight progress with trend analysis</p>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-icon">💪</div>
+        <div class="feature-title">Workout Plans</div>
+        <p class="feature-desc">Customized exercise based on your BMI & goals</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Money Back Guarantee -->
+  <div style="margin-top: 60px; padding: 35px; background: linear-gradient(135deg, rgba(36, 161, 72, 0.15), rgba(36, 161, 72, 0.05)); border-radius: 20px; text-align: center; border: 2px solid rgba(36, 161, 72, 0.2);">
+    <div style="font-size: 3rem; margin-bottom: 15px;">💯</div>
+    <h3 style="font-size: 1.8rem; font-weight: 800; color: var(--success); margin-bottom: 15px;">
+      30-Day Money Back Guarantee
+    </h3>
+    <p style="color: var(--muted-text); max-width: 650px; margin: 0 auto; font-size: 1.05rem;">
+      Not satisfied with Premium? Get a full refund within 30 days, no questions asked. Your health journey is completely risk-free! 🛡️
+    </p>
+  </div>
+</div>
+
+<style>
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95) translateY(-20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+</style>
+
+<script>
+function showPaymentQR(planType, amount) {
+  document.getElementById('paymentModal').style.display = 'flex';
+  document.getElementById('planDetails').textContent = planType === 'monthly' ? '💳 Monthly Plan' : '🌟 Yearly Plan';
+  document.getElementById('amountDetails').textContent = '₹' + amount;
+  document.getElementById('planTypeInput').value = planType;
+  document.body.style.overflow = 'hidden';
+}
+
+function closePaymentModal() {
+  document.getElementById('paymentModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// Close modal on outside click
+document.getElementById('paymentModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closePaymentModal();
+  }
+});
+</script>
+{% endblock %}

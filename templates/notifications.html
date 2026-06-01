@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card notifications-card">
+  <h2>🔔 Notifications</h2>
+  <p class="text-muted">Your recent alerts and reminders</p>
+
+  {% if notifications %}
+  <div class="notifications-list">
+    {% for notif in notifications %}
+    <div class="notification-item {% if notif[2] == 'warning' %}warning{% elif notif[2] == 'success' %}success{% else %}info{% endif %} {% if notif[3] %}read{% endif %}">
+      <div class="notif-icon">
+        {% if notif[2] == 'warning' %}⚠️{% elif notif[2] == 'success' %}✅{% else %}ℹ️{% endif %}
+      </div>
+      <div class="notif-content">
+        <p class="notif-message">{{ notif[1] }}</p>
+        <span class="notif-time">{{ notif[4] }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>🔕 No notifications yet</p>
+    <span>You'll see important alerts and reminders here</span>
+  </div>
+  {% endif %}
+
+  <div class="notif-actions">
+    <a href="{{ url_for('settings') }}" class="btn-secondary">⚙️ Notification Settings</a>
+    <a href="{{ url_for('dashboard') }}" class="btn-secondary">← Back</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="result-page">
+  <h2>Detected Food</h2>
+  <img src="{{ url_for('static', filename='uploads/' + image) }}" width="300"><br><br>
+
+  <h3>Main Dish: {{ main_dish[0] }} ({{ main_dish[2] }})</h3>
+
+  <h4>All Detected Items:</h4>
+  <ul>
+    {% for item, score, category in items %}
+      <li>{{ item }} — {{ (score * 100) | round(1) }}% <small>({{ category }})</small></li>
+    {% endfor %}
+  </ul>
+  <a href="{{ url_for('upload') }}">Upload Another</a>
+</div>
+{% endblock %}

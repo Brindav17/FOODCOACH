@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Tracker - Food Coach</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">🍽️ Food Coach</div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('food_history') }}">Food Log</a></li>
+            <li><a href="{{ url_for('history') }}">History</a></li>
+            <li><a href="{{ url_for('weight_tracker') }}">Weight</a></li>
+            <li><a href="{{ url_for('profile') }}">Profile</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        <div class="card">
+            <h2 style="margin-top: 0;">⚖️ Weight Tracker</h2>
+            <p class="text-muted">Track your weight progress over time</p>
+
+            <!-- Current Weight Display -->
+            <div style="text-align: center; margin: 30px 0;">
+                <div style="display: inline-block; background: linear-gradient(135deg, #ffb74d, #f57c00); color: white; padding: 30px 50px; border-radius: 20px; box-shadow: 0 10px 30px rgba(255, 183, 77, 0.3);">
+                    <div style="font-size: 3rem; font-weight: 800; margin-bottom: 5px;">
+                        {{ current_weight if current_weight else '—' }}
+                    </div>
+                    <div style="font-size: 1.2rem; opacity: 0.95;">kg</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 10px;">Current Weight</div>
+                </div>
+            </div>
+
+            <!-- Add Weight Form -->
+            <form method="POST" style="max-width: 500px; margin: 0 auto 40px;">
+                <div style="display: flex; gap: 10px; align-items: flex-end;">
+                    <div style="flex: 1;">
+                        <label for="weight" style="display: block; margin-bottom: 8px; font-weight: 600;">📝 Update Weight (kg)</label>
+                        <input type="number" step="0.1" name="weight" id="weight" placeholder="e.g., 68.5" required
+                               style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e9e9f3; font-size: 15px;">
+                    </div>
+                    <button type="submit" class="btn-primary" style="padding: 12px 24px; white-space: nowrap;">
+                        💾 Save
+                    </button>
+                </div>
+            </form>
+
+            <!-- Weight Progress Chart -->
+            {% if logs %}
+            <div style="max-width: 900px; margin: 40px auto;">
+                <h3 style="margin-bottom: 20px;">📈 Weight Progress</h3>
+                <div style="height: 400px;">
+                    <canvas id="weightChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Weight History Table -->
+            <div style="margin-top: 40px;">
+                <h3>📋 Recent Entries</h3>
+                <div style="overflow-x: auto;">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Weight (kg)</th>
+                                <th>Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(logs|length) %}
+                            <tr>
+                                <td>{{ logs[i][1] }}</td>
+                                <td>{{ logs[i][2] }}</td>
+                                <td><strong>{{ logs[i][0] }} kg</strong></td>
+                                <td>
+                                    {% if i < logs|length - 1 %}
+                                        {% set diff = logs[i][0] - logs[i+1][0] %}
+                                        {% if diff > 0 %}
+                                            <span style="color: #d64545; font-weight: 600;">▲ {{ "%.1f"|format(diff) }} kg</span>
+                                        {% elif diff < 0 %}
+                                            <span style="color: #24a148; font-weight: 600;">▼ {{ "%.1f"|format(-diff) }} kg</span>
+                                        {% else %}
+                                            <span style="color: #6b7280;">— No change</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span style="color: #6b7280;">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 40px; background: rgba(108, 99, 255, 0.05); border-radius: 12px; margin-top: 30px;">
+                <p style="font-size: 1.1rem; color: var(--muted-text);">📝 No weight entries yet. Start tracking your progress!</p>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="{{ url_for('dashboard') }}" style="display: inline-block; padding: 10px 20px; background: white; border: 2px solid var(--accent); color: var(--accent); border-radius: 10px; font-weight: 600; text-decoration: none;">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </main>
+
+    {% if logs %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('weightChart').getContext('2d');
+        const logs = {{ logs | tojson }};
+
+        // Reverse to show oldest to newest
+        const reversed = [...logs].reverse();
+        const labels = reversed.map(log => log[1]);
+        const weights = reversed.map(log => log[0]);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Weight (kg)',
+                    data: weights,
+                    borderColor: 'rgb(255, 159, 64)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: 'rgb(255, 159, 64)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: { size: 14, family: 'Poppins', weight: '600' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: {
+                            font: { size: 12, family: 'Poppins' },
+                            callback: function(value) { return value + ' kg'; }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11, family: 'Poppins' } }
+                    }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

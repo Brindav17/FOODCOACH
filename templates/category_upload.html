@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>📸 Upload {{ category_name }} Food</h2>
+  <p class="text-muted">Take a photo or upload an image for automatic calorie detection</p>
+
+  <!-- Premium/Free Status Badge -->
+  {% if is_premium %}
+  <div class="scans-badge" style="background: linear-gradient(135deg, #24a148, #1b7a4a); color: white;">
+    👑 Premium Active - Unlimited Scans
+  </div>
+  {% elif scans_remaining is not none %}
+  <div class="scans-badge {% if scans_remaining <= 1 %}warning{% endif %}">
+    {% if scans_remaining > 0 %}
+      🎯 {{ scans_remaining }} free scan{{ 's' if scans_remaining != 1 else '' }} remaining
+    {% else %}
+      ⚠️ No free scans left - <a href="{{ url_for('premium') }}" style="color: white; text-decoration: underline; font-weight: 800;">Upgrade to Premium</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Upload Form -->
+  <form method="POST" enctype="multipart/form-data" style="margin-top: 30px;">
+    <div class="field">
+      <label for="image" style="display: block; font-weight: 700; margin-bottom: 12px; font-size: 1rem;">
+        📷 Select Food Image
+      </label>
+      <input type="file" 
+             name="image" 
+             id="image" 
+             accept="image/*" 
+             required
+             {% if not is_premium and scans_remaining == 0 %}disabled{% endif %}
+             style="padding: 15px; 
+                    border: 2px dashed var(--accent); 
+                    border-radius: 12px; 
+                    background: rgba(108, 99, 255, 0.03); 
+                    cursor: pointer;
+                    width: 100%;
+                    font-family: 'Poppins', sans-serif;
+                    font-size: 0.95rem;">
+      <small style="display: block; margin-top: 10px; color: var(--muted-text);">
+        📌 Supported formats: JPG, PNG, JPEG • Max size: 10MB
+      </small>
+    </div>
+
+    <!-- Image Preview -->
+    <div id="imagePreview" style="margin-top: 20px; display: none;">
+      <label style="display: block; font-weight: 700; margin-bottom: 10px;">Preview:</label>
+      <img id="previewImg" src="" alt="Preview" style="max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" 
+              class="btn-primary" 
+              {% if not is_premium and scans_remaining == 0 %}disabled{% endif %}
+              style="{% if not is_premium and scans_remaining == 0 %}opacity: 0.5; cursor: not-allowed;{% endif %}">
+        🔍 Analyze Food & Get Calories
+      </button>
+      <a href="{{ url_for('dashboard') }}" class="btn-secondary">
+        ← Back to Dashboard
+      </a>
+    </div>
+
+    {% if not is_premium and scans_remaining == 0 %}
+    <div style="margin-top: 20px; padding: 15px; background: rgba(255, 107, 107, 0.1); border-radius: 10px; border-left: 4px solid var(--danger);">
+      <strong style="color: var(--danger);">⚠️ Upload Disabled</strong>
+      <p style="margin: 5px 0 0; color: var(--muted-text);">
+        You've used all 3 free scans. <a href="{{ url_for('premium') }}" style="color: var(--accent); font-weight: 700;">Upgrade to Premium</a> for unlimited food scanning!
+      </p>
+    </div>
+    {% endif %}
+  </form>
+
+  <!-- How It Works Section -->
+  <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, rgba(108, 99, 255, 0.05), rgba(108, 99, 255, 0.02)); border-radius: 14px;">
+    <h3 style="margin: 0 0 15px; color: var(--text); font-size: 1.2rem;">✨ How It Works</h3>
+    <ol style="margin: 0; padding-left: 25px; color: var(--muted-text); line-height: 1.8;">
+      <li><strong>Upload Image:</strong> Take a clear photo of your food</li>
+      <li><strong>AI Analysis:</strong> Our AI identifies the food and calculates calories</li>
+      <li><strong>Auto-Save:</strong> Results are automatically saved to your food log</li>
+      <li><strong>Track Progress:</strong> View your daily calorie intake on the dashboard</li>
+    </ol>
+  </div>
+
+  <!-- Tips Section -->
+  <div style="margin-top: 20px; padding: 20px; background: rgba(36, 161, 72, 0.08); border-radius: 12px; border-left: 4px solid var(--success);">
+    <h4 style="margin: 0 0 10px; color: var(--success); display: flex; align-items: center; gap: 8px;">
+      💡 Tips for Best Results
+    </h4>
+    <ul style="margin: 0; padding-left: 25px; color: var(--muted-text); line-height: 1.7;">
+      <li>Use good lighting for clear photos</li>
+      <li>Capture the entire dish in frame</li>
+      <li>Avoid blurry or dark images</li>
+      <li>Take photos from above for better recognition</li>
+    </ul>
+  </div>
+
+  <!-- Category Info -->
+  <div style="margin-top: 25px; text-align: center; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+    <h4 style="margin: 0 0 10px; color: var(--accent);">📂 Category: {{ category_name }}</h4>
+    <p style="margin: 0; color: var(--muted-text);">
+      Our AI is optimized for {{ category_name }} cuisine and can recognize hundreds of dishes!
+    </p>
+  </div>
+</div>
+
+<!-- Image Preview Script -->
+<script>
+document.getElementById('image').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      document.getElementById('previewImg').src = event.target.result;
+      document.getElementById('imagePreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+</script>
+
+<style>
+.field input[type="file"]:hover:not([disabled]) {
+  border-color: var(--accent-600);
+  background: rgba(108, 99, 255, 0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.field input[type="file"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
+.scans-badge {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  margin: 15px 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.scans-badge.warning {
+  background: linear-gradient(135deg, #ff6b6b, #ff5252);
+  color: white;
+  animation: warningPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes warningPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.3);
+  }
+  50% { 
+    transform: scale(1.05); 
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+  }
+}
+</style>
+{% endblock %}

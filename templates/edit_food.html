@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Food Entry - Food Coach</title>
+
+  <style>
+  /* ===== Edit Food Entry Page (only this page) ===== */
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at 0% 0%, #ede9fe, #f9fafb 40%, #f3e8ff 100%);
+    color: #111827;
+  }
+
+  .navbar {
+    background: linear-gradient(90deg, #a855f7, #7c3aed);
+    color: #fff;
+    padding: 14px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(55, 48, 163, 0.35);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-weight: 800;
+    font-size: 18px;
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-links a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+  }
+
+  .nav-links a:hover {
+    background: rgba(255,255,255,0.18);
+  }
+
+  .flash-container {
+    max-width: 960px;
+    margin: 14px auto 0;
+    padding: 0 18px;
+  }
+
+  .flash {
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  main {
+    max-width: 960px;
+    margin: 32px auto 0;
+    padding: 0 18px 60px;
+  }
+
+  .card.manual-entry-card {
+    background: #ffffff;
+    border-radius: 22px;
+    padding: 26px 28px 30px;
+    box-shadow: 0 22px 55px rgba(15, 23, 42, 0.16);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+  }
+
+  .manual-entry-card h2 {
+    margin: 0 0 6px;
+    font-size: 1.7rem;
+    font-weight: 800;
+  }
+
+  .text-muted {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 22px;
+  }
+
+  .manual-entry-form .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 26px;
+    margin-bottom: 24px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field.tip-box {
+    grid-column: 1 / -1;
+  }
+
+  .manual-entry-form label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #111827;
+  }
+
+  .manual-entry-form input[type="text"],
+  .manual-entry-form input[type="number"] {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    background: #ffffff;
+    font-size: 0.96rem;
+    font-family: inherit;
+  }
+
+  .manual-entry-form input[disabled] {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+
+  .manual-entry-form input:focus {
+    outline: none;
+    border-color: #a855f7;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+  }
+
+  .tip-content {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(168,85,247,0.08), rgba(168,85,247,0.02));
+    border-left: 4px solid #a855f7;
+    font-size: 0.9rem;
+    color: #111827;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .btn-primary {
+    border: none;
+    border-radius: 999px;
+    padding: 11px 22px;
+    background: linear-gradient(120deg, #c4b5fd, #7c3aed);
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 14px 30px rgba(129, 140, 248, 0.55);
+  }
+
+  .btn-secondary {
+    text-decoration: none;
+    border-radius: 999px;
+    padding: 10px 20px;
+    border: 2px solid #a855f7;
+    color: #a855f7;
+    font-weight: 600;
+    background: transparent;
+  }
+
+  footer {
+    text-align: center;
+    padding: 28px;
+    color: #6b7280;
+    font-size: 0.9rem;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 30px;
+  }
+
+  @media (max-width: 768px) {
+    .manual-entry-form .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .card.manual-entry-card {
+      padding: 20px 18px 24px;
+    }
+    main {
+      padding: 0 12px 40px;
+    }
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">🍎 Food Coach</div>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('dashboard') }}">Home</a></li>
+      <li><a href="{{ url_for('food_history') }}">History</a></li>
+      <li><a href="{{ url_for('profile') }}">Profile</a></li>
+      <li><a href="{{ url_for('logout') }}">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+
+  <!-- Main Content -->
+  <main>
+    <div class="card manual-entry-card">
+      <h2>✏️ Edit Food Entry</h2>
+      <p class="text-muted">Update your food entry details</p>
+
+      <form method="POST" class="manual-entry-form">
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="food_name">🍽️ Food Name</label>
+            <input type="text" name="food_name" id="food_name" value="{{ food[1] }}" required>
+          </div>
+
+          <div class="field">
+            <label for="calories">🔥 Calories</label>
+            <input type="number" name="calories" id="calories" value="{{ food[2] }}" required>
+          </div>
+
+          <div class="field">
+            <label>📂 Category</label>
+            <input type="text" value="{{ food[3] }}" disabled>
+          </div>
+
+          <div class="field tip-box">
+            <div class="tip-content">
+              <strong>💡 Tip:</strong> You can only edit the food name and calorie count. Category is locked to maintain data integrity.
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="protein">🥩 Protein (g)</label>
+            <input type="number" step="0.1" name="protein" id="protein"
+                   value="{{ food[4] if food|length > 4 else 0 }}" placeholder="Optional">
+          </div>
+
+          <div class="field">
+            <label for="carbs">🍞 Carbs (g)</label>
+            <input type="number" step="0.1" name="carbs" id="carbs"
+                   value="{{ food[5] if food|length > 5 else 0 }}" placeholder="Optional">
+          </div>
+
+          <div class="field">
+            <label for="fat">🥑 Fat (g)</label>
+            <input type="number" step="0.1" name="fat" id="fat"
+                   value="{{ food[6] if food|length > 6 else 0 }}" placeholder="Optional">
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">💾 Update Entry</button>
+          <a href="{{ url_for('food_history') }}" class="btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>Made with 💜 by Food Coach Team | © 2024 All Rights Reserved</p>
+  </footer>
+
+</body>
+</html>
